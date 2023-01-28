@@ -1,0 +1,130 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: back-deployment
+  labels:
+    app: back-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: back-deployment
+  template:
+    metadata:
+      labels:
+        app: back-deployment
+    spec:
+      imagePullSecrets:
+      - name: myregistrykey
+      containers:
+        - name: backend
+          image: hamdinh98/olympiqs-repo:core
+          ports:
+            - containerPort: 4001
+          env:
+            - name: CLIENT_ID
+              valueFrom:
+                secretKeyRef:
+                  name: app-secret
+                  key: CLIENT-ID
+            - name: CLIENT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: app-secret
+                  key: CLIENT-SECRET
+            - name: APP_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: app-secret
+                  key: APP_SECRET
+            - name: RESET_PWD_TOKEN_TTL
+              valueFrom:
+                secretKeyRef:
+                  name: app-secret
+                  key: RESET_PWD_TOKEN_TTL
+            - name: ACCESS_TOKEN_TTL
+              valueFrom:
+                secretKeyRef:
+                  name: app-secret
+                  key: ACCESS_TOKEN_TTL
+            - name: APP_ENV
+              valueFrom:
+                configMapKeyRef:
+                  name: app-configmap
+                  key: APP_ENV
+            - name: HOST
+              valueFrom:
+                configMapKeyRef:
+                  name: app-configmap
+                  key: HOST
+            - name: ADMIN_HOST
+              valueFrom:
+                configMapKeyRef:
+                  name: app-configmap
+                  key: HOST
+            - name: PUBLIC_API_HOST
+              valueFrom:
+                configMapKeyRef:
+                  name: app-configmap
+                  key: HOST
+            - name: ORGANIZATION
+              valueFrom:
+                configMapKeyRef:
+                  name: app-configmap
+                  key: ORGANIZATION
+            - name: PUBLIC_ORGANIZATION
+              valueFrom:
+                configMapKeyRef:
+                  name: app-configmap
+                  key: PUBLIC_ORGANIZATION
+            - name: MONGODB_URL
+              valueFrom:
+                configMapKeyRef:
+                  name: app-configmap
+                  key: MONGODB_URL
+            - name: MONGODB_DB
+              valueFrom:
+                configMapKeyRef:
+                  name: app-configmap
+                  key: MONGODB_DB
+            - name: MONGODB_REPLICASET
+              valueFrom:
+                configMapKeyRef:
+                  name: app-configmap
+                  key: MONGODB_REPLICASET
+            - name: MONGODB_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: app-secret
+                  key: MONGODB_USERNAME
+            - name: MONGODB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: app-secret
+                  key: MONGODB_PASSWORD
+            - name: OAUTH2_PRIVATE_KEY
+              valueFrom:
+                configMapKeyRef:
+                  name: app-configmap
+                  key: OAUTH2_PRIVATE_KEY
+            - name: OAUTH2_PUBLIC_KEY
+              valueFrom:
+                configMapKeyRef:
+                  name: app-configmap
+                  key: OAUTH2_PUBLIC_KEY
+
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: backend-service
+  labels:
+    app: backend-service
+spec:
+  selector:
+    app: back-deployment
+  ports:
+    - port: 4001
+      targetPort: 4001
+      protocol: TCP

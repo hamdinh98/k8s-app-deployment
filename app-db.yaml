@@ -1,0 +1,59 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mongo-deployment
+  labels:
+    app: mongo-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: mongo-deployment
+  template:
+    metadata:
+      labels:
+        app: mongo-deployment
+    spec:
+      imagePullSecrets:
+      - name: myregistrykey
+      containers:
+        - name: database
+          image: mongo
+          ports:
+            - containerPort: 27019
+          env:
+            - name: MONGODB_ROOT_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: app-secret
+                  key: MONGODB_ROOT_PASSWORD
+            - name: MONGODB_REPLICA_SET_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: app-secret
+                  key: MONGODB_REPLICA_SET_KEY
+            - name: MONGODB_REPLICA_SET_MODE
+              valueFrom:
+                configMapKeyRef:
+                  name: app-configmap
+                  key: MONGODB_REPLICA_SET_MODE
+            - name: MONGODB_REPLICA_SET_NAME
+              valueFrom:
+                configMapKeyRef:
+                  name: app-configmap
+                  key: MONGODB_REPLICA_SET_NAME
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: mongo-service
+  labels:
+    app: mongo-service
+spec:
+  selector:
+    app: mongo-deployment
+  ports:
+    - port: 27019
+      targetPort: 27019
+      protocol: TCP

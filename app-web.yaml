@@ -1,0 +1,61 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: front-deployment
+  labels:
+    app: front-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: front-deployment
+  template:
+    metadata:
+      labels:
+        app: front-deployment
+    spec:
+      imagePullSecrets:
+      - name: myregistrykey
+      containers:
+      - name: frontend
+        image: hamdinh98/olympiqs-repo:web
+        ports:
+          - containerPort: 4000
+        env:
+          - name: CLIENT_ID
+            valueFrom:
+              secretKeyRef:
+                name: app-secret
+                key: CLIENT-ID
+          - name: CLIENT_SECRET
+            valueFrom:
+              secretKeyRef:
+                name: app-secret
+                key: CLIENT-SECRET
+          - name: PUBLIC_URL
+            valueFrom:
+              configMapKeyRef:
+                name: app-configmap
+                key: PUBLIC_URL
+          - name: MERCURE_PUBLISH_URL
+            valueFrom:
+              configMapKeyRef:
+                name: app-configmap
+                key: MERCURE_PUBLISH_URL
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: frontend-service
+  labels:
+    app: frontend-service
+spec:
+  selector:
+    app: front-deployment
+  ports:
+  - protocol: TCP
+    port: 4000
+    targetPort: 4000
+
+

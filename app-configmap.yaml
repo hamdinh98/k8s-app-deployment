@@ -5,7 +5,7 @@ metadata:
 data:
   PUBLIC_URL: /
   MERCURE_PUBLISH_URL: https://mercure.dev.ats-digital.com/.well-known/mercure
-  APP_ENV: prod
+  APP_ENV: dev
   HOST: olympiqs.local
   ADMIN_HOST: olympiqs-adm.local
   PUBLIC_API_HOST: api.olympiqs.com
